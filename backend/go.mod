@@ -1,4 +1,4 @@
-module github.com/LaurelEdison/clashcoder
+module github.com/LaurelEdison/clashcoder/backend
 
 go 1.24.6
 
