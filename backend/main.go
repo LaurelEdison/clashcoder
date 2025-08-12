@@ -6,6 +6,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
 	"go.uber.org/zap"
 )
@@ -20,6 +22,20 @@ func getPort(zapLogger *zap.Logger) string {
 	return portstring
 }
 
+func setupCors(zapLogger *zap.Logger, router chi.Router) {
+
+	router.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"https://*", "http://*"}, // Allow all origins for dev
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"*"}, // Accept all headers
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: false,
+		MaxAge:           300,
+	}))
+
+	zapLogger.Info("CORS middleware configuered")
+}
+
 func main() {
 	godotenv.Load(".env")
 	zapLogger, _ := zap.NewProduction()
@@ -27,4 +43,8 @@ func main() {
 
 	portstring := getPort(zapLogger)
 	zapLogger.Info("Starting server ", zap.String("port", portstring))
+
+	router := chi.NewRouter()
+	setupCors(zapLogger, router)
+
 }
