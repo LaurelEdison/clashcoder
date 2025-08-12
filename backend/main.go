@@ -1,8 +1,11 @@
 package main
 
 import (
+	"net/http"
 	"os"
 
+	"github.com/LaurelEdison/clashcoder/backend/handlers"
+	"github.com/LaurelEdison/clashcoder/backend/routes"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
@@ -43,5 +46,22 @@ func main() {
 
 	router := chi.NewRouter()
 	setupCors(zapLogger, router)
+
+	routes.SetupRoutes(router, handlers.New(zapLogger))
+
+	router.Mount("/clashcoder", router)
+
+	srv := http.Server{
+		Handler: router,
+		Addr:    ":" + portstring,
+	}
+
+	zapLogger.Info("Server starting on port", zap.String("portstring", portstring))
+
+	if err := srv.ListenAndServe(); err != nil {
+		zapLogger.Error("Failed to start http server", zap.Error(err))
+	}
+
+	zapLogger.Info("Port", zap.String("portstring", portstring))
 
 }
