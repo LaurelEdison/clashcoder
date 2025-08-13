@@ -1,8 +1,11 @@
 package main
 
 import (
+	"fmt"
+	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/LaurelEdison/clashcoder/backend/handlers"
 	"github.com/LaurelEdison/clashcoder/backend/routes"
@@ -37,9 +40,21 @@ func setupCors(zapLogger *zap.Logger, router chi.Router) {
 }
 
 func main() {
-	godotenv.Load(".env")
-	zapLogger, _ := zap.NewProduction()
-	defer zapLogger.Sync()
+
+	if err := godotenv.Load(".env"); err != nil {
+		log.Fatalf("Failed to load .env : %v", err)
+	}
+
+	zapLogger, err := zap.NewProduction()
+	fmt.Fprintf(os.Stderr, "Error starting logger: %v", err)
+
+	defer func() {
+		if err := zapLogger.Sync(); err != nil {
+			if !strings.Contains(err.Error(), "already closed") {
+				fmt.Fprintf(os.Stderr, "Error syncing logger: %v", err)
+			}
+		}
+	}()
 
 	portstring := getPort(zapLogger)
 	zapLogger.Info("Starting server ", zap.String("port", portstring))
