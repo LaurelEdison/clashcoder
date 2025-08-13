@@ -29,11 +29,9 @@ jobs:
       
     - name: Lint backend
       run: |
-        echo "No Go linter yet — skipping"
-        # Later: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
-        #        golangci-lint run
+        golangci-lint run
 
     - name: Test
       run: |
-          echo "No tests yet — passing"
-          # Later: go test ./...
+        cd backend
+        go test ./...
