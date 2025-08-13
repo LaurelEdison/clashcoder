@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -19,7 +20,7 @@ func TestHandlerHealth(t *testing.T) {
 	//Assert
 	resp := w.Result()
 
-	defer resp.Body.Close()
+	defer closeBody(t, resp.Body)
 
 	if resp.StatusCode != http.StatusOK {
 		t.Errorf("Expected status %d got %d",
@@ -36,4 +37,9 @@ func TestHandlerHealth(t *testing.T) {
 		t.Errorf("Expected body %s, got %s", string(bodyBytes), expected)
 	}
 
+}
+
+func closeBody(t *testing.T, c io.Closer) {
+	t.Helper()
+	_ = c.Close()
 }
