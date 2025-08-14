@@ -37,7 +37,24 @@ jobs:
         cd backend
         golangci-lint run ./...
 
-    - name: Test
+    - name: Run tests
       run: |
         cd backend
-        go test ./...
+        go test -v ./... 
+
+    - name: Run tests with race detection
+      run: |
+        cd backend
+        go test -v -race ./... 
+
+    - name: Run tests with coverage (fail if <80%)
+      run: |
+        cd backend
+        go test -coverprofile=coverage.out ./...
+        go tool cover -func=coverage.out
+        total=$(go tool cover -func=coverage.out | grep total: | awk '{print substr($3, 1, length($3)-1)}')
+        echo "Total coverage: ${total}%"
+        if (( $(echo "$total < 80" | bc -l) )); then
+          echo "❌ Coverage below 80% threshold!"
+          exit 1
+        fi
