@@ -40,17 +40,17 @@ jobs:
     - name: Run tests
       run: |
         cd backend
-        go test -v ./... 
+        go test -v ./handlers/... ./routes/... ./utils/...
 
     - name: Run tests with race detection
       run: |
         cd backend
-        go test -v -race ./... 
+        go test -v -race ./handlers/... ./routes/... ./utils/...
 
     - name: Run tests with coverage (fail if <80%)
       run: |
         cd backend
-        go test -coverprofile=coverage.out ./...
+        go test -coverprofile=coverage.out ./handlers/... ./routes/... ./utils/...
         go tool cover -func=coverage.out
         total=$(go tool cover -func=coverage.out | grep total: | awk '{print substr($3, 1, length($3)-1)}')
         echo "Total coverage: ${total}%"

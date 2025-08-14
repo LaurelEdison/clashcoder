@@ -15,6 +15,23 @@ import (
 	"go.uber.org/zap"
 )
 
+func NewServer(zapLogger *zap.Logger) *http.Server {
+	router := chi.NewRouter()
+	subRouter := chi.NewRouter()
+	utils.SetupCors(zapLogger, router)
+	routes.SetupRoutes(subRouter, handlers.New(zapLogger))
+
+	router.Mount("/clashcoder", subRouter)
+
+	portstring := utils.GetPort(zapLogger)
+
+	return &http.Server{
+		Handler: router,
+		Addr:    ":" + portstring,
+	}
+
+}
+
 func Run() error {
 	if err := godotenv.Load(".env"); err != nil {
 		log.Fatalf("Failed to load .env : %v", err)
@@ -30,21 +47,9 @@ func Run() error {
 		}
 	}()
 
-	portstring := utils.GetPort(zapLogger)
 	zapLogger.Info("Starting server ", zap.String("port", portstring))
 
-	router := chi.NewRouter()
-	subRouter := chi.NewRouter()
-	utils.SetupCors(zapLogger, router)
-	routes.SetupRoutes(subRouter, handlers.New(zapLogger))
-
-	router.Mount("/clashcoder", subRouter)
-
-	srv := http.Server{
-		Handler: router,
-		Addr:    ":" + portstring,
-	}
-
+	srv := NewServer(zapLogger)
 	zapLogger.Info("Server starting on port", zap.String("portstring", portstring))
 
 	err = srv.ListenAndServe()
