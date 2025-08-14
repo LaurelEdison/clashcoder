@@ -1,7 +1,15 @@
 package main
 
-import "github.com/LaurelEdison/clashcoder/backend/server"
+import (
+	"fmt"
+	"os"
+
+	"github.com/LaurelEdison/clashcoder/backend/server"
+)
 
 func main() {
-	server.Run()
+	if err := server.Run(); err != nil {
+		fmt.Fprintf(os.Stderr, "error starting server: %v", err)
+		os.Exit(1)
+	}
 }
