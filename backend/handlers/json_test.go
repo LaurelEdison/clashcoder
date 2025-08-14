@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -34,6 +35,12 @@ func TestRespondWithJSON(t *testing.T) {
 			payload:  []string{"a", "b"},
 			wantBody: `["a","b"]` + "\n",
 		},
+		{
+			name:     "encodeError_400",
+			status:   http.StatusBadRequest,
+			payload:  struct{ Ch chan int }{Ch: make(chan int)},
+			wantBody: "",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -51,6 +58,50 @@ func TestRespondWithJSON(t *testing.T) {
 		})
 	}
 
+}
+
+func TestRespondWithFailure(t *testing.T) {
+	tests := []struct {
+		name       string
+		code       int
+		msg        string
+		wantLevel  string
+		wantStatus int
+	}{
+		{
+			name:       "client error",
+			code:       400,
+			msg:        "bad request",
+			wantLevel:  "warn",
+			wantStatus: http.StatusBadRequest,
+		},
+		{
+			name:       "server error",
+			code:       500,
+			msg:        "internal error",
+			wantLevel:  "error",
+			wantStatus: http.StatusInternalServerError,
+		},
+	}
+
+	for _, tt := range tests {
+		h := &Handlers{
+			zapLogger: zap.NewNop(),
+		}
+		w := httptest.NewRecorder()
+		h.RespondWithError(w, tt.code, tt.msg)
+
+		assertStatus(t, w, tt.wantStatus)
+
+		var body map[string]string
+		if err := json.NewDecoder(w.Body).Decode(&body); err != nil {
+			t.Errorf("Error decoding json: %v", err)
+		}
+		if body["error"] != tt.msg {
+			t.Errorf("Expected error %v, got %v", body["error"], tt.msg)
+		}
+
+	}
 }
 
 //HELPER FUNCTIONS
