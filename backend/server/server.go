@@ -24,7 +24,7 @@ func NewServer(zapLogger *zap.Logger) *http.Server {
 	router.Mount("/clashcoder", subRouter)
 
 	portstring := utils.GetPort(zapLogger)
-
+	zapLogger.Info("Starting server ", zap.String("port", portstring))
 	return &http.Server{
 		Handler: router,
 		Addr:    ":" + portstring,
@@ -47,17 +47,12 @@ func Run() error {
 		}
 	}()
 
-	zapLogger.Info("Starting server ", zap.String("port", portstring))
-
 	srv := NewServer(zapLogger)
-	zapLogger.Info("Server starting on port", zap.String("portstring", portstring))
 
 	err = srv.ListenAndServe()
 	if err != nil && err != http.ErrServerClosed {
 		zapLogger.Error("Failed to start http server", zap.Error(err))
 	}
-
-	zapLogger.Info("Port", zap.String("portstring", portstring))
 
 	return err
 }
