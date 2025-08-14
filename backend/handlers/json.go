@@ -19,13 +19,12 @@ func (h *Handlers) RespondWithJSON(w http.ResponseWriter,
 }
 
 func (h *Handlers) RespondWithError(w http.ResponseWriter,
-	code int, msg string,
-	zapLogger *zap.Logger) {
+	code int, msg string) {
 	if code > 499 {
-		zapLogger.Error("Responding with server error",
+		h.zapLogger.Error("Responding with server error",
 			zap.Int("code", code), zap.String("message", msg))
 	} else {
-		zapLogger.Warn("Responding with client error",
+		h.zapLogger.Warn("Responding with client error",
 			zap.Int("code", code), zap.String("message", msg))
 	}
 
