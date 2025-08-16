@@ -11,13 +11,9 @@ type mockDB struct {
 }
 
 func TestInitHandlers(t *testing.T) {
-	zapLogger, err := zap.NewProduction()
+	zapLogger := zap.NewNop()
 	mockDb := &mockDB{}
-	if err != nil {
-		t.Errorf("Failed to initialize zapLogger: Error: %v", err)
-	}
 	h := New(zapLogger, &mockDb.DB)
-
 	if h.zapLogger == nil {
 		t.Errorf("Expected zapLogger to be initialized, got nil")
 	}
