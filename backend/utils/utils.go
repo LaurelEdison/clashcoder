@@ -18,6 +18,14 @@ func GetPort(zapLogger *zap.Logger) string {
 	return portstring
 }
 
+func GetDBUrl(zapLogger *zap.Logger) string {
+	dbURL := os.Getenv("DB_URL")
+	if dbURL == "" {
+		zapLogger.Error("Missing DB_URL from env")
+	}
+	return dbURL
+}
+
 func SetupCors(zapLogger *zap.Logger, router chi.Router) {
 
 	router.Use(cors.Handler(cors.Options{
