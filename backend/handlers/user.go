@@ -44,6 +44,34 @@ func (h *Handlers) SignUp(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func (h *Handlers) GetUserByEmail(w http.ResponseWriter, r *http.Request) {
+	type parameters struct {
+		Email string `json:"email"`
+	}
+	decoder := json.NewDecoder(r.Body)
+	params := parameters{}
+	if err := decoder.Decode(&params); err != nil {
+		h.RespondWithError(w, 400, "Error parsing json: %v")
+	}
+
+}
+
+func (h *Handlers) FetchProfileSelf(w http.ResponseWriter, r *http.Request) {
+	userID, ok := r.Context().Value("user_id").(uuid.UUID)
+	if !ok {
+		h.RespondWithError(w, http.StatusUnauthorized, "No user in context")
+		return
+	}
+	user, err := h.DB.GetUserByID(r.Context(), userID)
+	if err != nil {
+		h.RespondWithError(w, http.StatusInternalServerError, "Could not fetch user")
+		return
+	}
+
+	h.RespondWithJSON(w, http.StatusOK, databaseUserToUser(user))
+
+}
+
 // HELPERS
 func (h *Handlers) HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
