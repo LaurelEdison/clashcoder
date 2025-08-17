@@ -9,5 +9,6 @@ import (
 func SetupRoutes(router chi.Router, h *handlers.Handlers) {
 	router.Get("/healthz", h.HandlerHealth)
 	router.Post("/users", h.SignUp)
+	router.Post("/login", auth.Login(h))
 	router.With(auth.JWTAuthMiddleWare).Get("/me", h.FetchProfileSelf)
 }
