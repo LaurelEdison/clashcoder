@@ -22,12 +22,11 @@ func TestDataBaseUserToUser(t *testing.T) {
 	}
 
 	want := User{
-		ID:           userId,
-		CreatedAt:    now,
-		UpdatedAt:    now,
-		Name:         "Alice",
-		Email:        "Alice@gmail.com",
-		PasswordHash: "hashedpassword",
+		ID:        userId,
+		CreatedAt: now,
+		UpdatedAt: now,
+		Name:      "Alice",
+		Email:     "Alice@gmail.com",
 	}
 	got := databaseUserToUser(dbUser)
 
