@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/LaurelEdison/clashcoder/backend/handlers"
+	users "github.com/LaurelEdison/clashcoder/backend/handlers/user"
 	"github.com/golang-jwt/jwt"
 	"github.com/google/uuid"
 )
@@ -49,7 +50,7 @@ func Login(h *handlers.Handlers) http.HandlerFunc {
 			h.RespondWithError(w, http.StatusUnauthorized, "Invalid email or password")
 			return
 		}
-		if err := handlers.CheckPasswordHash(user.PasswordHash, params.Password); !err {
+		if err := users.CheckPasswordHash(user.PasswordHash, params.Password); !err {
 			h.RespondWithError(w, http.StatusUnauthorized, "Invalid email or password")
 			return
 		}
@@ -63,17 +64,6 @@ func Login(h *handlers.Handlers) http.HandlerFunc {
 		h.RespondWithJSON(w, 200, map[string]string{"token": token})
 
 	}
-}
-
-type ContextKey string
-
-const (
-	UserIDKey ContextKey = "user_id"
-)
-
-func GetUserId(ctx context.Context) (uuid.UUID, bool) {
-	id, ok := ctx.Value(UserIDKey).(uuid.UUID)
-	return id, ok
 }
 
 func JWTAuthMiddleWare(next http.Handler) http.Handler {
@@ -109,7 +99,7 @@ func JWTAuthMiddleWare(next http.Handler) http.Handler {
 				http.Error(w, "Invalid token", http.StatusUnauthorized)
 				return
 			}
-			ctx := context.WithValue(r.Context(), "user_id", userID)
+			ctx := context.WithValue(r.Context(), users.UserIDKey, userID)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		} else {
 			http.Error(w, "Invalid token", http.StatusUnauthorized)

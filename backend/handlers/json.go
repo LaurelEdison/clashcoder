@@ -13,7 +13,7 @@ func (h *Handlers) RespondWithJSON(w http.ResponseWriter,
 	w.WriteHeader(code)
 
 	if err := json.NewEncoder(w).Encode(payload); err != nil {
-		h.zapLogger.Error("Error encoding json", zap.Error(err))
+		h.ZapLogger.Error("Error encoding json", zap.Error(err))
 	}
 
 }
@@ -21,10 +21,10 @@ func (h *Handlers) RespondWithJSON(w http.ResponseWriter,
 func (h *Handlers) RespondWithError(w http.ResponseWriter,
 	code int, msg string) {
 	if code > 499 {
-		h.zapLogger.Error("Responding with server error",
+		h.ZapLogger.Error("Responding with server error",
 			zap.Int("code", code), zap.String("message", msg))
 	} else {
-		h.zapLogger.Warn("Responding with client error",
+		h.ZapLogger.Warn("Responding with client error",
 			zap.Int("code", code), zap.String("message", msg))
 	}
 

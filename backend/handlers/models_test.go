@@ -28,7 +28,7 @@ func TestDataBaseUserToUser(t *testing.T) {
 		Name:      "Alice",
 		Email:     "Alice@gmail.com",
 	}
-	got := databaseUserToUser(dbUser)
+	got := DatabaseUserToUser(dbUser)
 
 	if got != want {
 		t.Errorf("Database user to user got %v, expected %v", got, want)

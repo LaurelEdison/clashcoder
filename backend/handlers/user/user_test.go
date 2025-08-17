@@ -1,10 +1,10 @@
-package handlers
+package users
 
 import (
 	"testing"
 
+	"github.com/LaurelEdison/clashcoder/backend/internal/database"
 	"github.com/stretchr/testify/assert"
-	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -19,15 +19,14 @@ func TestSignUpHandler(t *testing.T) {
 	t.Skip("Integration test pending")
 }
 
+type MockDB struct {
+	DB database.Queries
+}
+
 func TestHashPassword(t *testing.T) {
-	zapLogger := zap.NewNop()
-	mockdb := &mockDB{}
-
-	h := New(zapLogger, &mockdb.DB)
-
 	password := "securepassword"
 
-	hash, err := h.HashPassword(password)
+	hash, err := HashPassword(password)
 
 	if err != nil {
 		t.Fatalf("Error hashing password: %v", err)

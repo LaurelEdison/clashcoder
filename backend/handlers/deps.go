@@ -6,13 +6,13 @@ import (
 )
 
 type Handlers struct {
-	zapLogger *zap.Logger
+	ZapLogger *zap.Logger
 	DB        *database.Queries
 }
 
 func New(zapLogger *zap.Logger, DB *database.Queries) *Handlers {
 	return &Handlers{
-		zapLogger: zapLogger,
+		ZapLogger: zapLogger,
 		DB:        DB,
 	}
 }

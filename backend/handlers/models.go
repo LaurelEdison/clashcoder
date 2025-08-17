@@ -17,7 +17,7 @@ type User struct {
 	LastLoginAt sql.NullTime `json:"last_login_at"`
 }
 
-func databaseUserToUser(dbUser database.User) User {
+func DatabaseUserToUser(dbUser database.User) User {
 	return User{
 		ID:          dbUser.ID,
 		CreatedAt:   dbUser.CreatedAt,
