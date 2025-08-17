@@ -65,11 +65,16 @@ func Login(h *handlers.Handlers) http.HandlerFunc {
 	}
 }
 
-type contextKey string
+type ContextKey string
 
 const (
-	userIDKey contextKey = "user_id"
+	UserIDKey ContextKey = "user_id"
 )
+
+func GetUserId(ctx context.Context) (uuid.UUID, bool) {
+	id, ok := ctx.Value(UserIDKey).(uuid.UUID)
+	return id, ok
+}
 
 func JWTAuthMiddleWare(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -104,7 +109,7 @@ func JWTAuthMiddleWare(next http.Handler) http.Handler {
 				http.Error(w, "Invalid token", http.StatusUnauthorized)
 				return
 			}
-			ctx := context.WithValue(r.Context(), userIDKey, userID)
+			ctx := context.WithValue(r.Context(), "user_id", userID)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		} else {
 			http.Error(w, "Invalid token", http.StatusUnauthorized)
