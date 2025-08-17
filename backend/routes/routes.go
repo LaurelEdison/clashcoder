@@ -3,12 +3,13 @@ package routes
 import (
 	"github.com/LaurelEdison/clashcoder/backend/handlers"
 	"github.com/LaurelEdison/clashcoder/backend/handlers/auth"
+	users "github.com/LaurelEdison/clashcoder/backend/handlers/user"
 	"github.com/go-chi/chi/v5"
 )
 
 func SetupRoutes(router chi.Router, h *handlers.Handlers) {
 	router.Get("/healthz", h.HandlerHealth)
-	router.Post("/users", h.SignUp)
+	router.Post("/users", users.SignUp(h))
 	router.Post("/login", auth.Login(h))
-	router.With(auth.JWTAuthMiddleWare).Get("/me", h.FetchProfileSelf)
+	router.With(auth.JWTAuthMiddleWare).Get("/me", users.FetchProfileSelf(h))
 }

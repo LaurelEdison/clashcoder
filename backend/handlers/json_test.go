@@ -45,7 +45,7 @@ func TestRespondWithJSON(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			h := &Handlers{
-				zapLogger: zap.NewNop(),
+				ZapLogger: zap.NewNop(),
 			}
 			w := httptest.NewRecorder()
 
@@ -86,7 +86,7 @@ func TestRespondWithFailure(t *testing.T) {
 
 	for _, tt := range tests {
 		h := &Handlers{
-			zapLogger: zap.NewNop(),
+			ZapLogger: zap.NewNop(),
 		}
 		w := httptest.NewRecorder()
 		h.RespondWithError(w, tt.code, tt.msg)

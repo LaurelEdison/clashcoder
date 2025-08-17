@@ -6,15 +6,15 @@ import (
 	"testing"
 )
 
-type mockDB struct {
+type MockDB struct {
 	DB database.Queries
 }
 
 func TestInitHandlers(t *testing.T) {
 	zapLogger := zap.NewNop()
-	mockDb := &mockDB{}
+	mockDb := &MockDB{}
 	h := New(zapLogger, &mockDb.DB)
-	if h.zapLogger == nil {
+	if h.ZapLogger == nil {
 		t.Errorf("Expected zapLogger to be initialized, got nil")
 	}
 }
