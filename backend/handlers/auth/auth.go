@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
@@ -14,15 +13,11 @@ import (
 	"github.com/google/uuid"
 )
 
-func getJWTSecret() []byte {
-	secret := os.Getenv("JWT_SECRET")
-	if secret == "" {
-		panic("JWT_SECRET is not set")
-	}
-	return []byte(secret)
-}
+var jwtSecret []byte
 
-var jwtSecret = getJWTSecret()
+func InitJWT(secret string) {
+	jwtSecret = []byte(secret)
+}
 
 func generateJWT(userID uuid.UUID) (string, error) {
 

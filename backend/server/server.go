@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/LaurelEdison/clashcoder/backend/handlers"
+	"github.com/LaurelEdison/clashcoder/backend/handlers/auth"
 	"github.com/LaurelEdison/clashcoder/backend/internal/database"
 	"github.com/LaurelEdison/clashcoder/backend/routes"
 	"github.com/LaurelEdison/clashcoder/backend/utils"
@@ -22,6 +23,12 @@ func NewServer(zapLogger *zap.Logger) *http.Server {
 
 	portstring := utils.GetPort(zapLogger)
 	dbURL := utils.GetDBUrl(zapLogger)
+
+	secret := os.Getenv("JWT_SECRET")
+	if secret == "" {
+		panic("JWT_SECRET is not set")
+	}
+	auth.InitJWT(secret)
 
 	conn, err := sql.Open("postgres", dbURL)
 	if err != nil {
