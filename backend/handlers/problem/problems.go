@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func GetAll(h *handlers.Handlers) http.HandlerFunc {
+func GetAllProblems(h *handlers.Handlers) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		problems, err := h.DB.GetAllProblems(r.Context())
 		if err != nil {
@@ -19,7 +19,7 @@ func GetAll(h *handlers.Handlers) http.HandlerFunc {
 	}
 }
 
-func GetById(h *handlers.Handlers) http.HandlerFunc {
+func GetProblemById(h *handlers.Handlers) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		type parameters struct {
 			ID uuid.UUID `json:"id"`
