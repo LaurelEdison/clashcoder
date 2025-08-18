@@ -54,11 +54,6 @@ func GetProblemByRandom(h *handlers.Handlers) http.HandlerFunc {
 
 func CreateProblem(h *handlers.Handlers) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		role, ok := r.Context().Value("role").(string)
-		if !ok || role != "admin" {
-			h.RespondWithError(w, http.StatusBadRequest, "Admins only")
-			return
-		}
 		type parameters struct {
 			Title         string         `json:"id"`
 			Description   string         `json:"description"`
