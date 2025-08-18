@@ -20,10 +20,11 @@ func InitJWT(secret string) {
 	jwtSecret = []byte(secret)
 }
 
-func generateJWT(userID uuid.UUID) (string, error) {
+func generateJWT(userID uuid.UUID, role string) (string, error) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user_id": userID.String(),
+		"role":    role,
 		"exp":     time.Now().Add(time.Hour * 72).Unix(),
 	})
 
@@ -55,7 +56,7 @@ func Login(h *handlers.Handlers) http.HandlerFunc {
 			return
 		}
 
-		token, err := generateJWT(user.ID)
+		token, err := generateJWT(user.ID, user.Role)
 		if err != nil {
 			h.RespondWithError(w, http.StatusInternalServerError, "Could not generate token")
 			return
@@ -88,18 +89,24 @@ func JWTAuthMiddleWare(next http.Handler) http.Handler {
 		}
 
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			uidStr, ok := claims["user_id"].(string)
-			if !ok {
+			uidStr, idOk := claims["user_id"].(string)
+			role, roleOk := claims["role"].(string)
+			if !idOk {
 				http.Error(w, "Invalid token", http.StatusUnauthorized)
 				return
 			}
-
+			if !roleOk {
+				http.Error(w, "Invalid token", http.StatusUnauthorized)
+				return
+			}
 			userID, err := uuid.Parse(uidStr)
 			if err != nil {
 				http.Error(w, "Invalid token", http.StatusUnauthorized)
 				return
 			}
-			ctx := context.WithValue(r.Context(), users.UserIDKey, userID)
+			ctx := r.Context()
+			ctx = context.WithValue(ctx, users.UserIDKey, userID)
+			ctx = context.WithValue(ctx, users.UserRoleKey, role)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		} else {
 			http.Error(w, "Invalid token", http.StatusUnauthorized)

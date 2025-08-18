@@ -15,6 +15,7 @@ type User struct {
 	Name        string       `json:"name"`
 	Email       string       `json:"email"`
 	LastLoginAt sql.NullTime `json:"last_login_at"`
+	Role        string       `json:"role"`
 }
 
 func DatabaseUserToUser(dbUser database.User) User {
@@ -25,6 +26,7 @@ func DatabaseUserToUser(dbUser database.User) User {
 		Name:        dbUser.Name,
 		Email:       dbUser.Email,
 		LastLoginAt: dbUser.LastLoginAt,
+		Role:        dbUser.Role,
 	}
 }
 

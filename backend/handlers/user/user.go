@@ -108,7 +108,8 @@ func CheckPasswordHash(HashedPassword, password string) bool {
 type ContextKey string
 
 const (
-	UserIDKey ContextKey = "user_id"
+	UserIDKey   ContextKey = "user_id"
+	UserRoleKey ContextKey = "role"
 )
 
 func GetUserId(ctx context.Context) (uuid.UUID, bool) {
