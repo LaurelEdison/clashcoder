@@ -16,4 +16,5 @@ func SetupRoutes(router chi.Router, h *handlers.Handlers) {
 	router.Get("/problems", problem.GetAllProblems(h))
 	router.Post("/problems", problem.CreateProblem(h))
 	router.Get("/problems/{id}", problem.GetProblemById(h))
+	router.Get("/problems", problem.GetProblemByRandom(h))
 }
