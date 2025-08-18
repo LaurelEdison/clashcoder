@@ -62,4 +62,5 @@ type User struct {
 	Email        string
 	PasswordHash string
 	LastLoginAt  sql.NullTime
+	Role         string
 }

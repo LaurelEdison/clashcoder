@@ -8,7 +8,9 @@ CREATE TABLE users (
 	email TEXT UNIQUE NOT NULL,
 	password_hash TEXT NOT NULL,
 	last_login_at TIMESTAMP,
-	CONSTRAINT email_format CHECK (email ~* '^[^@]+@[^@]+\.[^@]+$')
+	CONSTRAINT email_format CHECK (email ~* '^[^@]+@[^@]+\.[^@]+$'),
+	role TEXT NOT NULL DEFAULT 'user'
+
 );
 
 -- +goose Down
