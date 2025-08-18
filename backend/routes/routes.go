@@ -14,5 +14,6 @@ func SetupRoutes(router chi.Router, h *handlers.Handlers) {
 	router.Post("/login", auth.Login(h))
 	router.With(auth.JWTAuthMiddleWare).Get("/me", users.FetchProfileSelf(h))
 	router.Get("/problems", problem.GetAllProblems(h))
+	router.Post("/problems", problem.CreateProblem(h))
 	router.Get("/problems/{id}", problem.GetProblemById(h))
 }

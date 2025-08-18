@@ -1,9 +1,13 @@
 package problem
 
 import (
+	"database/sql"
+	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/LaurelEdison/clashcoder/backend/handlers"
+	"github.com/LaurelEdison/clashcoder/backend/internal/database"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 )
@@ -45,5 +49,45 @@ func GetProblemByRandom(h *handlers.Handlers) http.HandlerFunc {
 			return
 		}
 		h.RespondWithJSON(w, http.StatusOK, handlers.DatabaseProblemToProblem(problem))
+	}
+}
+
+func CreateProblem(h *handlers.Handlers) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		role, ok := r.Context().Value("role").(string)
+		if !ok || role != "admin" {
+			h.RespondWithError(w, http.StatusBadRequest, "Admins only")
+			return
+		}
+		type parameters struct {
+			Title         string         `json:"id"`
+			Description   string         `json:"description"`
+			Difficulty    sql.NullString `json:"difficulty"`
+			TimeLimit     int32          `json:"time_limit"`
+			MemoryLimitMb int32          `json:"memory_limit_mb"`
+		}
+		decoder := json.NewDecoder(r.Body)
+		params := parameters{}
+		if err := decoder.Decode(&params); err != nil {
+			h.RespondWithError(w, http.StatusBadRequest, "Error decoding json")
+			return
+		}
+
+		problem, err := h.DB.CreateProblem(r.Context(), database.CreateProblemParams{
+			ID:            uuid.New(),
+			CreatedAt:     time.Now(),
+			UpdatedAt:     time.Now(),
+			Title:         params.Title,
+			Description:   params.Description,
+			Difficulty:    params.Difficulty,
+			TimeLimit:     params.TimeLimit,
+			MemoryLimitMb: params.MemoryLimitMb,
+		})
+		if err != nil {
+			h.RespondWithError(w, http.StatusInternalServerError, "Error creating user")
+			return
+		}
+		h.RespondWithJSON(w, http.StatusOK, handlers.DatabaseProblemToProblem(problem))
+
 	}
 }
