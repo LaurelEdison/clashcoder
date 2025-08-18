@@ -40,3 +40,14 @@ func GetById(h *handlers.Handlers) http.HandlerFunc {
 		h.RespondWithJSON(w, http.StatusOK, handlers.DatabaseProblemToProblem(problem))
 	}
 }
+
+func GetProblemByRandom(h *handlers.Handlers) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		problem, err := h.DB.GetRandomProblem(r.Context())
+		if err != nil {
+			h.RespondWithError(w, http.StatusBadRequest, "Could not get user")
+			return
+		}
+		h.RespondWithJSON(w, http.StatusOK, handlers.DatabaseProblemToProblem(problem))
+	}
+}
