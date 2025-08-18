@@ -25,11 +25,13 @@ func SignUp(h *handlers.Handlers) http.HandlerFunc {
 		params := parameters{}
 		if err := decoder.Decode(&params); err != nil {
 			h.RespondWithError(w, 400, "Error parsing json: %v")
+			return
 		}
 
 		passhash, err := HashPassword(params.Password)
 		if err != nil {
 			h.ZapLogger.Error("Error hashing password", zap.Error(err))
+			return
 		}
 
 		user, err := h.DB.CreateUser(r.Context(), database.CreateUserParams{
@@ -42,6 +44,7 @@ func SignUp(h *handlers.Handlers) http.HandlerFunc {
 		})
 		if err != nil {
 			h.RespondWithError(w, 500, fmt.Sprintf("Error creating user: %v", err))
+			return
 		}
 
 		h.RespondWithJSON(w, 200, handlers.DatabaseUserToUser(user))
@@ -57,7 +60,15 @@ func GetUserByEmail(h *handlers.Handlers) http.HandlerFunc {
 		params := parameters{}
 		if err := decoder.Decode(&params); err != nil {
 			h.RespondWithError(w, 400, "Error parsing json: %v")
+			return
 		}
+		user, err := h.DB.GetUserByEmail(r.Context(), params.Email)
+		if err != nil {
+			h.RespondWithError(w, http.StatusInternalServerError, "Could not fetch user")
+			return
+		}
+
+		h.RespondWithJSON(w, http.StatusOK, handlers.DatabaseUserToUser(user))
 	}
 }
 
