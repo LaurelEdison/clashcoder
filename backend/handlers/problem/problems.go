@@ -21,17 +21,13 @@ func GetAllProblems(h *handlers.Handlers) http.HandlerFunc {
 
 func GetProblemById(h *handlers.Handlers) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		type parameters struct {
-			ID uuid.UUID `json:"id"`
-		}
-		decoder := json.NewDecoder(r.Body)
-		params := parameters{}
-
-		if err := decoder.Decode(&params); err != nil {
-			h.RespondWithError(w, http.StatusBadRequest, "Error parsing json")
+		idParam := chi.URLParam(r, "id")
+		problemID, err := uuid.Parse(idParam)
+		if err != nil {
+			h.RespondWithError(w, http.StatusBadRequest, "Could not parse problem id")
 			return
 		}
-		problem, err := h.DB.GetProblemByID(r.Context(), params.ID)
+		problem, err := h.DB.GetProblemByID(r.Context(), problemID)
 
 		if err != nil {
 			h.RespondWithError(w, http.StatusBadRequest, "Could not get user")
