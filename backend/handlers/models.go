@@ -52,3 +52,10 @@ func DatabaseProblemToProblem(dbProblem database.Problem) Problem {
 	}
 }
 
+func DatabaseProblemsToProblems(dbProblems []database.Problem) []Problem {
+	problems := []Problem{}
+	for _, dbProblem := range dbProblems {
+		problems = append(problems, DatabaseProblemToProblem(dbProblem))
+	}
+	return problems
+}
