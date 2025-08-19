@@ -118,7 +118,7 @@ func JWTAuthMiddleWare(next http.Handler) http.Handler {
 
 func RequireAdmin(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		role, ok := r.Context().Value("role").(string)
+		role, ok := r.Context().Value(users.UserRoleKey).(string)
 		if !ok || role != "admin" {
 			http.Error(w, "Forbidden: Admin only", http.StatusForbidden)
 			return
