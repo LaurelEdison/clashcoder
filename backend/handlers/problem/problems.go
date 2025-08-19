@@ -55,7 +55,7 @@ func GetProblemByRandom(h *handlers.Handlers) http.HandlerFunc {
 func CreateProblem(h *handlers.Handlers) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		type parameters struct {
-			Title         string         `json:"id"`
+			Title         string         `json:"title"`
 			Description   string         `json:"description"`
 			Difficulty    sql.NullString `json:"difficulty"`
 			TimeLimit     int32          `json:"time_limit"`
