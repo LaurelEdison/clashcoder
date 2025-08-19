@@ -55,11 +55,11 @@ func GetProblemByRandom(h *handlers.Handlers) http.HandlerFunc {
 func CreateProblem(h *handlers.Handlers) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		type parameters struct {
-			Title         string         `json:"title"`
-			Description   string         `json:"description"`
-			Difficulty    sql.NullString `json:"difficulty"`
-			TimeLimit     int32          `json:"time_limit"`
-			MemoryLimitMb int32          `json:"memory_limit_mb"`
+			Title         string `json:"title"`
+			Description   string `json:"description"`
+			Difficulty    string `json:"difficulty"`
+			TimeLimit     int32  `json:"time_limit"`
+			MemoryLimitMb int32  `json:"memory_limit_mb"`
 		}
 		decoder := json.NewDecoder(r.Body)
 		params := parameters{}
@@ -74,7 +74,7 @@ func CreateProblem(h *handlers.Handlers) http.HandlerFunc {
 			UpdatedAt:     time.Now(),
 			Title:         params.Title,
 			Description:   params.Description,
-			Difficulty:    params.Difficulty,
+			Difficulty:    sql.NullString{String: params.Difficulty, Valid: params.Difficulty != ""},
 			TimeLimit:     params.TimeLimit,
 			MemoryLimitMb: params.MemoryLimitMb,
 		})
