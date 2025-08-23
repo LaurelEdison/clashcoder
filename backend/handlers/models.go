@@ -75,3 +75,18 @@ type Submission struct {
 	Output    sql.NullString `json:"output"`
 }
 
+func DatabaseSubmissiontoSubmission(dbSubmission database.Submission) Submission {
+	return Submission{
+		ID:        dbSubmission.ID,
+		CreatedAt: dbSubmission.CreatedAt,
+		UserID:    dbSubmission.UserID,
+		ProblemID: dbSubmission.ProblemID,
+		Code:      dbSubmission.Code,
+		Language:  dbSubmission.Language,
+		Status:    dbSubmission.Status,
+		RuntimeMs: dbSubmission.RuntimeMs,
+		MemoryKb:  dbSubmission.MemoryKb,
+		Output:    dbSubmission.Output,
+	}
+}
+
