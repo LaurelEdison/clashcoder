@@ -90,3 +90,10 @@ func DatabaseSubmissiontoSubmission(dbSubmission database.Submission) Submission
 	}
 }
 
+func DatabaseSubmissionsToSubmissions(dbSubmissions []database.Submission) []Submission {
+	submissions := []Submission{}
+	for _, dbSubmission := range dbSubmissions {
+		submissions = append(submissions, DatabaseSubmissiontoSubmission(dbSubmission))
+	}
+	return submissions
+}
