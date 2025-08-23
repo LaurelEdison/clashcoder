@@ -61,3 +61,39 @@ func DatabaseProblemsToProblems(dbProblems []database.Problem) []Problem {
 	}
 	return problems
 }
+
+type Submission struct {
+	ID        uuid.UUID      `json:"id"`
+	CreatedAt time.Time      `json:"created_at"`
+	UserID    uuid.UUID      `json:"user_id"`
+	ProblemID uuid.UUID      `json:"problem_id"`
+	Code      string         `json:"code"`
+	Language  string         `json:"language"`
+	Status    sql.NullString `json:"status"`
+	RuntimeMs sql.NullInt32  `json:"runtime_ms"`
+	MemoryKb  sql.NullInt32  `json:"memory_kb"`
+	Output    sql.NullString `json:"output"`
+}
+
+func DatabaseSubmissiontoSubmission(dbSubmission database.Submission) Submission {
+	return Submission{
+		ID:        dbSubmission.ID,
+		CreatedAt: dbSubmission.CreatedAt,
+		UserID:    dbSubmission.UserID,
+		ProblemID: dbSubmission.ProblemID,
+		Code:      dbSubmission.Code,
+		Language:  dbSubmission.Language,
+		Status:    dbSubmission.Status,
+		RuntimeMs: dbSubmission.RuntimeMs,
+		MemoryKb:  dbSubmission.MemoryKb,
+		Output:    dbSubmission.Output,
+	}
+}
+
+func DatabaseSubmissionsToSubmissions(dbSubmissions []database.Submission) []Submission {
+	submissions := []Submission{}
+	for _, dbSubmission := range dbSubmissions {
+		submissions = append(submissions, DatabaseSubmissiontoSubmission(dbSubmission))
+	}
+	return submissions
+}
