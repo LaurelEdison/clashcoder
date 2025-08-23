@@ -61,3 +61,100 @@ func (q *Queries) CreateSubmission(ctx context.Context, arg CreateSubmissionPara
 	)
 	return i, err
 }
+
+const getAllSubmissionByUserID = `-- name: GetAllSubmissionByUserID :many
+SELECT id, created_at, user_id, problem_id, code, language, status, runtime_ms, memory_kb, output FROM submissions 
+WHERE user_id = $1 AND problem_id = $2
+ORDER BY created_at
+`
+
+type GetAllSubmissionByUserIDParams struct {
+	UserID    uuid.UUID
+	ProblemID uuid.UUID
+}
+
+func (q *Queries) GetAllSubmissionByUserID(ctx context.Context, arg GetAllSubmissionByUserIDParams) ([]Submission, error) {
+	rows, err := q.db.QueryContext(ctx, getAllSubmissionByUserID, arg.UserID, arg.ProblemID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Submission
+	for rows.Next() {
+		var i Submission
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UserID,
+			&i.ProblemID,
+			&i.Code,
+			&i.Language,
+			&i.Status,
+			&i.RuntimeMs,
+			&i.MemoryKb,
+			&i.Output,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getLatestSubmissionByUserID = `-- name: GetLatestSubmissionByUserID :one
+SELECT id, created_at, user_id, problem_id, code, language, status, runtime_ms, memory_kb, output FROM submissions 
+WHERE user_id = $1 AND problem_id = $2
+ORDER BY created_at DESC LIMIT 1
+`
+
+type GetLatestSubmissionByUserIDParams struct {
+	UserID    uuid.UUID
+	ProblemID uuid.UUID
+}
+
+func (q *Queries) GetLatestSubmissionByUserID(ctx context.Context, arg GetLatestSubmissionByUserIDParams) (Submission, error) {
+	row := q.db.QueryRowContext(ctx, getLatestSubmissionByUserID, arg.UserID, arg.ProblemID)
+	var i Submission
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UserID,
+		&i.ProblemID,
+		&i.Code,
+		&i.Language,
+		&i.Status,
+		&i.RuntimeMs,
+		&i.MemoryKb,
+		&i.Output,
+	)
+	return i, err
+}
+
+const getSubmissionByID = `-- name: GetSubmissionByID :one
+SELECT id, created_at, user_id, problem_id, code, language, status, runtime_ms, memory_kb, output FROM submissions 
+WHERE (id = $1)
+`
+
+func (q *Queries) GetSubmissionByID(ctx context.Context, id uuid.UUID) (Submission, error) {
+	row := q.db.QueryRowContext(ctx, getSubmissionByID, id)
+	var i Submission
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UserID,
+		&i.ProblemID,
+		&i.Code,
+		&i.Language,
+		&i.Status,
+		&i.RuntimeMs,
+		&i.MemoryKb,
+		&i.Output,
+	)
+	return i, err
+}
