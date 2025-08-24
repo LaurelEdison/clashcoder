@@ -6,7 +6,7 @@ CREATE TABLE problems (
 	updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
 	title TEXT NOT NULL,
 	description TEXT NOT NULL,
-	difficulty TEXT check (difficulty in ('easy', 'medium', 'hard')),
+	difficulty TEXT NOT NULL check (difficulty in ('easy', 'medium', 'hard')),
 	time_limit INT NOT NULL DEFAULT 2000,
 	memory_limit_mb INT NOT NULL DEFAULT 256
 );
