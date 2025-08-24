@@ -31,14 +31,14 @@ func DatabaseUserToUser(dbUser database.User) User {
 }
 
 type Problem struct {
-	ID            uuid.UUID      `json:"id"`
-	CreatedAt     time.Time      `json:"created_at"`
-	UpdatedAt     time.Time      `json:"updated_at"`
-	Title         string         `json:"title"`
-	Description   string         `json:"description"`
-	Difficulty    sql.NullString `json:"difficulty"`
-	TimeLimit     int32          `json:"time_limit"`
-	MemoryLimitMb int32          `json:"memory_limit_mb"`
+	ID            uuid.UUID `json:"id"`
+	CreatedAt     time.Time `json:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at"`
+	Title         string    `json:"title"`
+	Description   string    `json:"description"`
+	Difficulty    string    `json:"difficulty"`
+	TimeLimit     int32     `json:"time_limit"`
+	MemoryLimitMb int32     `json:"memory_limit_mb"`
 }
 
 func DatabaseProblemToProblem(dbProblem database.Problem) Problem {
@@ -69,7 +69,7 @@ type Submission struct {
 	ProblemID uuid.UUID      `json:"problem_id"`
 	Code      string         `json:"code"`
 	Language  string         `json:"language"`
-	Status    sql.NullString `json:"status"`
+	Status    string         `json:"status"`
 	RuntimeMs sql.NullInt32  `json:"runtime_ms"`
 	MemoryKb  sql.NullInt32  `json:"memory_kb"`
 	Output    sql.NullString `json:"output"`
