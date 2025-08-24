@@ -9,6 +9,7 @@ CREATE TABLE submissions (
 	language TEXT NOT NULL, --like 'go', 'cpp', 'python'
 	status TEXT CHECK (
 		status in (
+			'running',
 			'pending',
 			'accepted',
 			'wrong_answer',
