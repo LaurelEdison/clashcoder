@@ -7,6 +7,7 @@ CREATE TABLE problems (
 	title TEXT NOT NULL,
 	description TEXT NOT NULL,
 	difficulty TEXT NOT NULL check (difficulty in ('easy', 'medium', 'hard')),
+	starter_code TEXT NOT NULL,
 	time_limit INT NOT NULL DEFAULT 2000,
 	memory_limit_mb INT NOT NULL DEFAULT 256
 );
