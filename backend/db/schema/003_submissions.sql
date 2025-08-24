@@ -7,7 +7,7 @@ CREATE TABLE submissions (
 	problem_id UUID NOT NULL REFERENCES problems(id) ON DELETE CASCADE,
 	code TEXT NOT NULL,
 	language TEXT NOT NULL, --like 'go', 'cpp', 'python'
-	status TEXT CHECK (
+	status TEXT NOT NULL CHECK (
 		status in (
 			'running',
 			'pending',
