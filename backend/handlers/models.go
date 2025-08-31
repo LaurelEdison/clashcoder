@@ -106,3 +106,20 @@ type ProblemTest struct {
 	TestCode  string    `json:"test_code"`
 }
 
+func DatabaseProblemTestToProblemTest(dbProblemTest database.ProblemTest) ProblemTest {
+	return ProblemTest{
+		ID:        dbProblemTest.ID,
+		CreatedAt: dbProblemTest.CreatedAt,
+		UpdatedAt: dbProblemTest.UpdatedAt,
+		ProblemID: dbProblemTest.ProblemID,
+		TestCode:  dbProblemTest.TestCode,
+	}
+}
+
+func DatabaseProblemTestsToProblemTests(dbProblemTests []database.ProblemTest) []ProblemTest {
+	problemtests := []ProblemTest{}
+	for _, dbProblemTest := range dbProblemTests {
+		problemtests = append(problemtests, DatabaseProblemTestToProblemTest(dbProblemTest))
+	}
+	return problemtests
+}
