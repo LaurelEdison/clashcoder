@@ -31,3 +31,13 @@ WHERE id = (
 )
 	RETURNING *;
 
+-- name: UpdateSubmissionResult :exec
+UPDATE submissions
+SET status = $2,
+output = $3
+WHERE id = $1;
+
+-- name: UpdateSubmissionStatus :exec
+UPDATE submissions
+SET status = $2
+WHERE id = $1;
