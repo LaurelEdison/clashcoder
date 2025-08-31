@@ -60,6 +60,7 @@ func CreateProblem(h *handlers.Handlers) http.HandlerFunc {
 			Difficulty    string `json:"difficulty"`
 			TimeLimit     int32  `json:"time_limit"`
 			MemoryLimitMb int32  `json:"memory_limit_mb"`
+			StarterCode   string `json:"starter_code"`
 		}
 		decoder := json.NewDecoder(r.Body)
 		params := parameters{}
@@ -77,6 +78,7 @@ func CreateProblem(h *handlers.Handlers) http.HandlerFunc {
 			Difficulty:    sql.NullString{String: params.Difficulty, Valid: params.Difficulty != ""},
 			TimeLimit:     params.TimeLimit,
 			MemoryLimitMb: params.MemoryLimitMb,
+			StarterCode:   params.StarterCode,
 		})
 		if err != nil {
 			h.RespondWithError(w, http.StatusInternalServerError, "Error creating user")
