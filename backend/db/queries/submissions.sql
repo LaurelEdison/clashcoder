@@ -17,3 +17,17 @@ ORDER BY created_at DESC LIMIT 1;
 SELECT * FROM submissions 
 WHERE user_id = $1 AND problem_id = $2
 ORDER BY created_at;
+
+-- name: SelectPendingSubmission :one
+
+UPDATE submissions
+SET status = 'running'
+WHERE id = (
+	SELECT id from submissions
+	WHERE status = 'pending'
+	ORDER BY created_at
+	LIMIT 1
+	FOR UPDATE SKIP LOCKED
+)
+	RETURNING *;
+
