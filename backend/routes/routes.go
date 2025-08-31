@@ -27,6 +27,8 @@ func SetupRoutes(router chi.Router, h *handlers.Handlers) {
 		router.Group(func(router chi.Router) {
 			router.Use(auth.RequireAdmin)
 			router.Post("/problems", problem.CreateProblem(h))
+			router.Post("/problems/{id}/tests", problem.CreateProblemTest(h))
+			router.Get("/problems/{id}/tests/all", problem.GetProblemTestsByProblemID(h))
 		})
 	})
 }

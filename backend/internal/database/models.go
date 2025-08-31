@@ -36,9 +36,18 @@ type Problem struct {
 	UpdatedAt     time.Time
 	Title         string
 	Description   string
-	Difficulty    sql.NullString
+	Difficulty    string
+	StarterCode   string
 	TimeLimit     int32
 	MemoryLimitMb int32
+}
+
+type ProblemTest struct {
+	ID        uuid.UUID
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	ProblemID uuid.UUID
+	TestCode  string
 }
 
 type Submission struct {
@@ -48,7 +57,7 @@ type Submission struct {
 	ProblemID uuid.UUID
 	Code      string
 	Language  string
-	Status    sql.NullString
+	Status    string
 	RuntimeMs sql.NullInt32
 	MemoryKb  sql.NullInt32
 	Output    sql.NullString

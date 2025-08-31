@@ -37,6 +37,7 @@ func CreateSubmission(h *handlers.Handlers) http.HandlerFunc {
 			CreatedAt: time.Now(),
 			UserID:    UserID,
 			ProblemID: params.ProblemID,
+			Status:    "pending",
 			Code:      params.Code,
 			Language:  params.Language,
 		})

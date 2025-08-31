@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/LaurelEdison/clashcoder/backend/handlers"
@@ -27,7 +28,8 @@ func SignUp(h *handlers.Handlers) http.HandlerFunc {
 			h.RespondWithError(w, 400, "Error parsing json: %v")
 			return
 		}
-
+		lowercName := strings.ToLower(params.Name)
+		lowercEmail := strings.ToLower(params.Email)
 		passhash, err := HashPassword(params.Password)
 		if err != nil {
 			h.ZapLogger.Error("Error hashing password", zap.Error(err))
@@ -38,8 +40,8 @@ func SignUp(h *handlers.Handlers) http.HandlerFunc {
 			ID:           uuid.New(),
 			CreatedAt:    time.Now(),
 			UpdatedAt:    time.Now(),
-			Name:         params.Name,
-			Email:        params.Email,
+			Name:         lowercName,
+			Email:        lowercEmail,
 			PasswordHash: passhash,
 		})
 		if err != nil {

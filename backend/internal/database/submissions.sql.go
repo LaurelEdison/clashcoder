@@ -27,7 +27,7 @@ type CreateSubmissionParams struct {
 	ProblemID uuid.UUID
 	Code      string
 	Language  string
-	Status    sql.NullString
+	Status    string
 	RuntimeMs sql.NullInt32
 	MemoryKb  sql.NullInt32
 	Output    sql.NullString
@@ -157,4 +157,70 @@ func (q *Queries) GetSubmissionByID(ctx context.Context, id uuid.UUID) (Submissi
 		&i.Output,
 	)
 	return i, err
+}
+
+const selectPendingSubmission = `-- name: SelectPendingSubmission :one
+
+UPDATE submissions
+SET status = 'running'
+WHERE id = (
+	SELECT id from submissions
+	WHERE status = 'pending'
+	ORDER BY created_at
+	LIMIT 1
+	FOR UPDATE SKIP LOCKED
+)
+	RETURNING id, created_at, user_id, problem_id, code, language, status, runtime_ms, memory_kb, output
+`
+
+func (q *Queries) SelectPendingSubmission(ctx context.Context) (Submission, error) {
+	row := q.db.QueryRowContext(ctx, selectPendingSubmission)
+	var i Submission
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UserID,
+		&i.ProblemID,
+		&i.Code,
+		&i.Language,
+		&i.Status,
+		&i.RuntimeMs,
+		&i.MemoryKb,
+		&i.Output,
+	)
+	return i, err
+}
+
+const updateSubmissionResult = `-- name: UpdateSubmissionResult :exec
+UPDATE submissions
+SET status = $2,
+output = $3
+WHERE id = $1
+`
+
+type UpdateSubmissionResultParams struct {
+	ID     uuid.UUID
+	Status string
+	Output sql.NullString
+}
+
+func (q *Queries) UpdateSubmissionResult(ctx context.Context, arg UpdateSubmissionResultParams) error {
+	_, err := q.db.ExecContext(ctx, updateSubmissionResult, arg.ID, arg.Status, arg.Output)
+	return err
+}
+
+const updateSubmissionStatus = `-- name: UpdateSubmissionStatus :exec
+UPDATE submissions
+SET status = $2
+WHERE id = $1
+`
+
+type UpdateSubmissionStatusParams struct {
+	ID     uuid.UUID
+	Status string
+}
+
+func (q *Queries) UpdateSubmissionStatus(ctx context.Context, arg UpdateSubmissionStatusParams) error {
+	_, err := q.db.ExecContext(ctx, updateSubmissionStatus, arg.ID, arg.Status)
+	return err
 }

@@ -1,7 +1,7 @@
 -- name: CreateProblem :one
 
-INSERT INTO problems (id, created_at, updated_at, title, description, difficulty, time_limit, memory_limit_mb)
-VALUES($1, $2, $3, $4, $5, $6, $7, $8)
+INSERT INTO problems (id, created_at, updated_at, title, description, difficulty, time_limit, memory_limit_mb, starter_code)
+VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)
 RETURNING *;
 
 -- name: GetProblemByID :one
