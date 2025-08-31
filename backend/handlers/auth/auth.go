@@ -38,7 +38,6 @@ func Login(h *handlers.Handlers) http.HandlerFunc {
 			Email    string `json:"email"`
 			Password string `json:"password"`
 		}
-
 		params := parameters{}
 
 		if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
@@ -46,7 +45,9 @@ func Login(h *handlers.Handlers) http.HandlerFunc {
 			return
 		}
 
-		user, err := h.DB.GetUserByEmail(r.Context(), params.Email)
+		lowerCemail := strings.ToLower(params.Email)
+
+		user, err := h.DB.GetUserByEmail(r.Context(), lowerCemail)
 		if err != nil {
 			h.RespondWithError(w, http.StatusUnauthorized, "Invalid email or password")
 			return
