@@ -1,15 +1,95 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
+	"log"
 	"os"
+	"os/exec"
+	"path/filepath"
+	"strings"
+	"time"
 
 	"github.com/LaurelEdison/clashcoder/backend/handlers/auth"
 	"github.com/LaurelEdison/clashcoder/backend/internal/database"
 	"github.com/LaurelEdison/clashcoder/backend/utils"
+	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 	"go.uber.org/zap"
 )
+
+func workerLoop(zapLogger *zap.Logger, queries *database.Queries) {
+	for {
+		ctx := context.Background()
+
+		submission, err := queries.SelectPendingSubmission(ctx)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				time.Sleep(2 * time.Second)
+				continue
+			}
+			zapLogger.Error("Error fetching submission", zap.Error(err))
+			time.Sleep(2 * time.Second)
+			continue
+		}
+
+		err = queries.UpdateSubmissionStatus(ctx, database.UpdateSubmissionStatusParams{
+			ID:     submission.ID,
+			Status: "running",
+		})
+		if err != nil {
+			zapLogger.Error("Error updating submission to running", zap.Error(err))
+			continue
+		}
+
+		problem, err := queries.GetProblemByID(ctx, submission.ProblemID)
+		if err != nil {
+			zapLogger.Error("Error fetching problem", zap.Error(err))
+			continue
+		}
+		tests, err := queries.GetProblemTestsByProblemID(ctx, submission.ProblemID)
+		if err != nil {
+			zapLogger.Error("Error fetching problem", zap.Error(err))
+			continue
+		}
+		result, err := RunJudge(zapLogger, submission, problem, tests)
+		if err != nil {
+			zapLogger.Error("Error running judge", zap.Error(err))
+			continue
+		}
+		status := "wrong_answer"
+		if ctx.Err() == context.DeadlineExceeded {
+			status = "time_limit_exceed"
+		} else if exitError, ok := err.(*exec.ExitError); ok {
+			if exitError.ExitCode() == 137 {
+				status = "memory_limit_exceed"
+			}
+		}
+		if result.Passed {
+			status = "accepted"
+		} else if strings.Contains(result.Output, "panic") || strings.Contains(result.Output, "exit status 2") {
+			status = "runtime_error"
+		} else if strings.Contains(result.ErrorMsg, "time limit exceeded") {
+			status = "time_limit_exceed"
+		} else if strings.Contains(result.ErrorMsg, "memory limit exceeded") {
+			status = "memory_limit_exceed"
+		}
+		zapLogger.Info("Judge results", zap.Bool("passed", result.Passed),
+			zap.String("result", result.Output), zap.String("error", result.ErrorMsg))
+
+		err = queries.UpdateSubmissionResult(ctx, database.UpdateSubmissionResultParams{
+			ID:     submission.ID,
+			Output: sql.NullString{String: result.Output},
+			Status: status,
+		})
+		if err != nil {
+			zapLogger.Error("Error updating submission to running", zap.Error(err))
+			continue
+		}
+
+	}
+}
 
 type JudgeResult struct {
 	Passed   bool
