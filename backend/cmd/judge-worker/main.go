@@ -176,11 +176,13 @@ func main() {
 
 	conn, err := sql.Open("postgres", dbURL)
 	if err != nil {
-		zapLogger.Error("Failed to connect to database", zap.Error(err))
+		zapLogger.Panic("Failed to connect to database", zap.Error(err))
+		return
 	}
 
 	if err := conn.Ping(); err != nil {
-		zapLogger.Error("Failed to connect to database", zap.Error(err))
+		zapLogger.Panic("Failed to connect to database", zap.Error(err))
+		return
 	}
 
 	queries := database.New(conn)
