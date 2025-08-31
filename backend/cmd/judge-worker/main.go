@@ -11,6 +11,12 @@ import (
 	"go.uber.org/zap"
 )
 
+type JudgeResult struct {
+	Passed   bool
+	Output   string
+	ErrorMsg string
+}
+
 func main() {
 	zapLogger, err := zap.NewProduction()
 	if err != nil {
