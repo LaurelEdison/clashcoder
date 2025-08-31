@@ -75,7 +75,7 @@ func CreateProblem(h *handlers.Handlers) http.HandlerFunc {
 			UpdatedAt:     time.Now(),
 			Title:         params.Title,
 			Description:   params.Description,
-			Difficulty:    sql.NullString{String: params.Difficulty, Valid: params.Difficulty != ""},
+			Difficulty:    params.Difficulty,
 			TimeLimit:     params.TimeLimit,
 			MemoryLimitMb: params.MemoryLimitMb,
 			StarterCode:   params.StarterCode,
