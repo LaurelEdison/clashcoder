@@ -159,6 +159,9 @@ func RunJudge(zapLogger *zap.Logger, submission database.Submission, problem dat
 }
 
 func main() {
+	if err := godotenv.Load(".env"); err != nil {
+		log.Fatalf("Failed to load .env : %v", err)
+	}
 	zapLogger, err := zap.NewProduction()
 	if err != nil {
 		panic(fmt.Sprintf("Error creating zap logger: %v", err))
