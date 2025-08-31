@@ -41,6 +41,14 @@ type Problem struct {
 	MemoryLimitMb int32
 }
 
+type ProblemTest struct {
+	ID        uuid.UUID
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	ProblemID uuid.UUID
+	TestCode  string
+}
+
 type Submission struct {
 	ID        uuid.UUID
 	CreatedAt time.Time
