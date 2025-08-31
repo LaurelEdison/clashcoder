@@ -7,7 +7,6 @@ package database
 
 import (
 	"context"
-	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
@@ -15,9 +14,9 @@ import (
 
 const createProblem = `-- name: CreateProblem :one
 
-INSERT INTO problems (id, created_at, updated_at, title, description, difficulty, time_limit, memory_limit_mb)
-VALUES($1, $2, $3, $4, $5, $6, $7, $8)
-RETURNING id, created_at, updated_at, title, description, difficulty, time_limit, memory_limit_mb
+INSERT INTO problems (id, created_at, updated_at, title, description, difficulty, time_limit, memory_limit_mb, starter_code)
+VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)
+RETURNING id, created_at, updated_at, title, description, difficulty, starter_code, time_limit, memory_limit_mb
 `
 
 type CreateProblemParams struct {
@@ -26,9 +25,10 @@ type CreateProblemParams struct {
 	UpdatedAt     time.Time
 	Title         string
 	Description   string
-	Difficulty    sql.NullString
+	Difficulty    string
 	TimeLimit     int32
 	MemoryLimitMb int32
+	StarterCode   string
 }
 
 func (q *Queries) CreateProblem(ctx context.Context, arg CreateProblemParams) (Problem, error) {
@@ -41,6 +41,7 @@ func (q *Queries) CreateProblem(ctx context.Context, arg CreateProblemParams) (P
 		arg.Difficulty,
 		arg.TimeLimit,
 		arg.MemoryLimitMb,
+		arg.StarterCode,
 	)
 	var i Problem
 	err := row.Scan(
@@ -50,6 +51,7 @@ func (q *Queries) CreateProblem(ctx context.Context, arg CreateProblemParams) (P
 		&i.Title,
 		&i.Description,
 		&i.Difficulty,
+		&i.StarterCode,
 		&i.TimeLimit,
 		&i.MemoryLimitMb,
 	)
@@ -58,7 +60,7 @@ func (q *Queries) CreateProblem(ctx context.Context, arg CreateProblemParams) (P
 
 const getAllProblems = `-- name: GetAllProblems :many
 
-SELECT id, created_at, updated_at, title, description, difficulty, time_limit, memory_limit_mb FROM problems
+SELECT id, created_at, updated_at, title, description, difficulty, starter_code, time_limit, memory_limit_mb FROM problems
 `
 
 func (q *Queries) GetAllProblems(ctx context.Context) ([]Problem, error) {
@@ -77,6 +79,7 @@ func (q *Queries) GetAllProblems(ctx context.Context) ([]Problem, error) {
 			&i.Title,
 			&i.Description,
 			&i.Difficulty,
+			&i.StarterCode,
 			&i.TimeLimit,
 			&i.MemoryLimitMb,
 		); err != nil {
@@ -95,7 +98,7 @@ func (q *Queries) GetAllProblems(ctx context.Context) ([]Problem, error) {
 
 const getProblemByID = `-- name: GetProblemByID :one
 
-SELECT id, created_at, updated_at, title, description, difficulty, time_limit, memory_limit_mb FROM problems
+SELECT id, created_at, updated_at, title, description, difficulty, starter_code, time_limit, memory_limit_mb FROM problems
 WHERE (id = $1)
 `
 
@@ -109,6 +112,7 @@ func (q *Queries) GetProblemByID(ctx context.Context, id uuid.UUID) (Problem, er
 		&i.Title,
 		&i.Description,
 		&i.Difficulty,
+		&i.StarterCode,
 		&i.TimeLimit,
 		&i.MemoryLimitMb,
 	)
@@ -116,7 +120,7 @@ func (q *Queries) GetProblemByID(ctx context.Context, id uuid.UUID) (Problem, er
 }
 
 const getRandomProblem = `-- name: GetRandomProblem :one
-SELECT id, created_at, updated_at, title, description, difficulty, time_limit, memory_limit_mb FROM problems ORDER BY RANDOM() LIMIT 1
+SELECT id, created_at, updated_at, title, description, difficulty, starter_code, time_limit, memory_limit_mb FROM problems ORDER BY RANDOM() LIMIT 1
 `
 
 func (q *Queries) GetRandomProblem(ctx context.Context) (Problem, error) {
@@ -129,6 +133,7 @@ func (q *Queries) GetRandomProblem(ctx context.Context) (Problem, error) {
 		&i.Title,
 		&i.Description,
 		&i.Difficulty,
+		&i.StarterCode,
 		&i.TimeLimit,
 		&i.MemoryLimitMb,
 	)
