@@ -186,6 +186,7 @@ func main() {
 	}
 
 	queries := database.New(conn)
+	workerLoop(zapLogger, queries)
 
 	zapLogger.Info("Judge worker started")
 
