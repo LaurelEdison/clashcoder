@@ -1,7 +1,6 @@
 package problem
 
 import (
-	"database/sql"
 	"encoding/json"
 	"net/http"
 	"time"
