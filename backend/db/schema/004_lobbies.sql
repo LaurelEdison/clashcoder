@@ -18,6 +18,9 @@ CREATE TABLE lobbies(
 	ready_state BOOLEAN NOT NULL DEFAULT false
 );
 
+CREATE UNIQUE INDEX unique_invite_code
+ON lobbies (invite_code);
+
 -- +goose Down
 
 DROP TABLE lobbies;
