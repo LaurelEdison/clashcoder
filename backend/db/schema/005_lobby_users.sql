@@ -10,7 +10,7 @@ CREATE TABLE lobby_users(
 
 CREATE UNIQUE INDEX one_host_per_lobby
 ON lobby_users(lobby_id)
-WHERE role = 'host'
+WHERE role = 'host';
 
 -- +goose Down
 
