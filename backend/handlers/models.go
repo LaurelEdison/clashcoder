@@ -124,14 +124,11 @@ func DatabaseProblemTestsToProblemTests(dbProblemTests []database.ProblemTest) [
 	return problemtests
 }
 
-type Lobby struct {
-	ID         uuid.UUID `json:"id"`
-	CreatedAt  time.Time `json:"created_at"`
-	UpdatedAt  time.Time `json:"updated_at"`
-	InviteCode string    `json:"invite_code"`
-	MaxUsers   int32     `json:"max_users"`
-	Status     string    `json:"status"`
-	ReadyState bool      `json:"ready_state"`
+type LobbyUser struct {
+	LobbyID  uuid.UUID `json:"lobby_id"`
+	UserID   uuid.UUID `json:"user_id"`
+	JoinedAt time.Time `json:"joined_at"`
+	Role     string    `json:"role"`
 }
 
 
@@ -143,5 +140,13 @@ type Lobby struct {
 	MaxUsers   int32     `json:"max_users"`
 	Status     string    `json:"status"`
 	ReadyState bool      `json:"ready_state"`
+}
+
+
+type LobbyUser struct {
+	LobbyID  uuid.UUID `json:"lobby_id"`
+	UserID   uuid.UUID `json:"user_id"`
+	JoinedAt time.Time `json:"joined_at"`
+	Role     string    `json:"role"`
 }
 
