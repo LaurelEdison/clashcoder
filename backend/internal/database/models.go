@@ -15,12 +15,12 @@ type Lobby struct {
 	ID         uuid.UUID
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
-	HostID     uuid.UUID
 	InviteCode string
 	MaxUsers   int32
 	StartedAt  sql.NullTime
 	EndedAt    sql.NullTime
 	Status     string
+	ReadyState bool
 }
 
 type LobbyUser struct {
