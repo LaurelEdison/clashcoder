@@ -168,3 +168,10 @@ func DatabaseLobbyUserToLobbyUser(dbLobbyUser database.LobbyUser) LobbyUser {
 	}
 }
 
+func DatabaseLobbyUsersToLobbyUsers(dbLobbyUsers []database.LobbyUser) []LobbyUser {
+	LobbyUsers := []LobbyUser{}
+	for _, dbLobbyUser := range dbLobbyUsers {
+		LobbyUsers = append(LobbyUsers, DatabaseLobbyUserToLobbyUser(dbLobbyUser))
+	}
+	return LobbyUsers
+}
