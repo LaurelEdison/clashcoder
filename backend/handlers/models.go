@@ -124,14 +124,6 @@ func DatabaseProblemTestsToProblemTests(dbProblemTests []database.ProblemTest) [
 	return problemtests
 }
 
-type LobbyUser struct {
-	LobbyID  uuid.UUID `json:"lobby_id"`
-	UserID   uuid.UUID `json:"user_id"`
-	JoinedAt time.Time `json:"joined_at"`
-	Role     string    `json:"role"`
-}
-
-
 type Lobby struct {
 	ID         uuid.UUID `json:"id"`
 	CreatedAt  time.Time `json:"created_at"`
