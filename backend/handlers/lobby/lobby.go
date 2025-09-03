@@ -27,3 +27,77 @@ func GenerateLobbyCode(length int) (string, error) {
 	return hexStr[:length], nil
 }
 
+func CreateLobby(h *handlers.Handlers) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		type parameters struct {
+			MaxUsers int `json:"max_users"`
+		}
+
+		UserID, ok := users.GetUserId(r.Context())
+		if !ok {
+			h.RespondWithError(w, http.StatusUnauthorized, "Failed getting userid")
+			return
+		}
+		decoder := json.NewDecoder(r.Body)
+		params := &parameters{}
+		err := decoder.Decode(params)
+		if err != nil {
+			h.RespondWithError(w, http.StatusBadRequest, "Could not decode json")
+			return
+		}
+		if params.MaxUsers < 2 {
+			h.RespondWithError(w, http.StatusBadRequest, "Invalid max users must be atleast 2")
+			return
+		}
+		if params.MaxUsers > 8 {
+			h.RespondWithError(w, http.StatusBadRequest, "Invalid max users must be atleast 2")
+			return
+		}
+
+		LobbyCode, err := GenerateLobbyCode(8)
+		if err != nil {
+			h.RespondWithError(w, http.StatusInternalServerError, "Could not generate lobby code")
+			return
+		}
+		Lobby, err := h.DB.CreateLobby(r.Context(), database.CreateLobbyParams{
+			ID:         uuid.New(),
+			CreatedAt:  time.Now(),
+			UpdatedAt:  time.Now(),
+			InviteCode: LobbyCode,
+			MaxUsers:   int32(params.MaxUsers),
+			StartedAt:  sql.NullTime{Time: time.Now()},
+			ReadyState: false,
+			Status:     "waiting",
+		})
+		if err != nil {
+			h.RespondWithError(w, http.StatusInternalServerError, "Failed to create lobby")
+			return
+		}
+
+		_, err = CreateLobbyHost(h, r, Lobby.ID, UserID)
+		if err != nil {
+			h.RespondWithError(w, http.StatusInternalServerError, "Failed to create lobby host")
+			return
+		}
+
+		h.RespondWithJSON(w, http.StatusOK, handlers.DatabaseLobbyToLobby(Lobby))
+	}
+}
+
+func GetLobbyById(h *handlers.Handlers) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		LobbyIDstr := chi.URLParam(r, "lobby_id")
+		LobbyID, err := uuid.Parse(LobbyIDstr)
+		if err != nil {
+			h.RespondWithError(w, http.StatusBadRequest, "Failed decoding lobby id")
+			return
+		}
+		Lobby, err := h.DB.GetLobbyById(r.Context(), LobbyID)
+		if err != nil {
+			h.RespondWithError(w, http.StatusBadRequest, "Could not fetch lobby")
+			return
+		}
+		h.RespondWithJSON(w, http.StatusOK, handlers.DatabaseLobbyToLobby(Lobby))
+
+	}
+}
