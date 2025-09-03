@@ -123,3 +123,25 @@ func DatabaseProblemTestsToProblemTests(dbProblemTests []database.ProblemTest) [
 	}
 	return problemtests
 }
+
+type Lobby struct {
+	ID         uuid.UUID `json:"id"`
+	CreatedAt  time.Time `json:"created_at"`
+	UpdatedAt  time.Time `json:"updated_at"`
+	InviteCode string    `json:"invite_code"`
+	MaxUsers   int32     `json:"max_users"`
+	Status     string    `json:"status"`
+	ReadyState bool      `json:"ready_state"`
+}
+
+
+type Lobby struct {
+	ID         uuid.UUID `json:"id"`
+	CreatedAt  time.Time `json:"created_at"`
+	UpdatedAt  time.Time `json:"updated_at"`
+	InviteCode string    `json:"invite_code"`
+	MaxUsers   int32     `json:"max_users"`
+	Status     string    `json:"status"`
+	ReadyState bool      `json:"ready_state"`
+}
+
