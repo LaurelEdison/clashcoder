@@ -142,6 +142,15 @@ type Lobby struct {
 	ReadyState bool      `json:"ready_state"`
 }
 
+func DatabaseLobbyToLobby(dbLobby database.Lobby) Lobby {
+	return Lobby{
+		ID:         dbLobby.ID,
+		InviteCode: dbLobby.InviteCode,
+		MaxUsers:   dbLobby.MaxUsers,
+		Status:     dbLobby.Status,
+		ReadyState: dbLobby.ReadyState,
+	}
+}
 
 type LobbyUser struct {
 	LobbyID  uuid.UUID `json:"lobby_id"`
