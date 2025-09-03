@@ -159,3 +159,12 @@ type LobbyUser struct {
 	Role     string    `json:"role"`
 }
 
+func DatabaseLobbyUserToLobbyUser(dbLobbyUser database.LobbyUser) LobbyUser {
+	return LobbyUser{
+		LobbyID:  dbLobbyUser.LobbyID,
+		UserID:   dbLobbyUser.UserID,
+		JoinedAt: dbLobbyUser.JoinedAt,
+		Role:     dbLobbyUser.Role,
+	}
+}
+
