@@ -27,6 +27,14 @@ func SetupRoutes(router chi.Router, h *handlers.Handlers) {
 		router.Get("/submissions/{problem_id}/latest", submission.GetSubmissionByUserID(h))
 		router.Get("/submissions/{problem_id}/all", submission.GetAllSubmissionsByUserID(h))
 
+		router.Post("/lobbies", lobby.CreateLobby(h))
+		router.Get("/lobbies/{lobby_id}", lobby.GetLobbyById(h))
+		router.Post("/lobbies/{lobby_id}/join", lobby.CreateLobbyUser(h))
+		router.Get("/lobbies/{lobby_id}", lobby.GetUsersByLobbyID(h))
+		router.Get("/lobbies/{lobby_id}/host", lobby.GetHostFromLobbyID(h))
+		router.Get("/lobbies/{lobby_id}/leave", lobby.RemoveSelfFromLobby(h))
+		router.Get("/lobbies/{lobby_id}/{target_id}/kick", lobby.RemoveUserFromLobby(h))
+
 		router.Group(func(router chi.Router) {
 			router.Use(auth.RequireAdmin)
 			router.Post("/problems", problem.CreateProblem(h))
