@@ -51,3 +51,23 @@ func CreateLobbyHost(h *handlers.Handlers, r *http.Request, LobbyID uuid.UUID, U
 	return LobbyUser, err
 }
 
+func GetUsersByLobbyID(h *handlers.Handlers) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		LobbyIDstr := chi.URLParam(r, "lobby_id")
+		LobbyID, err := uuid.Parse(LobbyIDstr)
+		if err != nil {
+			h.RespondWithError(w, http.StatusBadRequest, "Failed decoding lobby id")
+			return
+		}
+
+		LobbyUsers, err := h.DB.GetLobbyUsersByLobbyID(r.Context(), LobbyID)
+		if err != nil {
+			h.RespondWithError(w, http.StatusBadRequest, "Failed fetching LobbyUsers")
+			return
+		}
+
+		h.RespondWithJSON(w, http.StatusOK, handlers.DatabaseLobbyUsersToLobbyUsers(LobbyUsers))
+	}
+}
+
