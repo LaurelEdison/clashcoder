@@ -17,3 +17,13 @@ import (
 	"github.com/google/uuid"
 )
 
+func GenerateLobbyCode(length int) (string, error) {
+	randomBytes := make([]byte, 16)
+	if _, err := io.ReadFull(rand.Reader, randomBytes); err != nil {
+		return "", err
+	}
+	hash := sha256.Sum256(randomBytes)
+	hexStr := hex.EncodeToString(hash[:])
+	return hexStr[:length], nil
+}
+
