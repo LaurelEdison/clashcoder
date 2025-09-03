@@ -115,3 +115,54 @@ func RemoveSelfFromLobby(h *handlers.Handlers) http.HandlerFunc {
 	}
 }
 
+func RemoveUserFromLobby(h *handlers.Handlers) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		LobbyIDstr := chi.URLParam(r, "lobby_id")
+		LobbyID, err := uuid.Parse(LobbyIDstr)
+		if err != nil {
+			h.RespondWithError(w, http.StatusBadRequest, "Failed decoding lobby id")
+			return
+		}
+		LobbyHost, err := h.DB.GetHostFromLobbyID(r.Context(), LobbyID)
+
+		TargetIDStr := chi.URLParam(r, "target_id")
+		TargetID, err := uuid.Parse(TargetIDStr)
+		if err != nil {
+			h.RespondWithError(w, http.StatusBadRequest, "Failed decoding target user id")
+			return
+		}
+
+		if err != nil {
+			h.RespondWithError(w, http.StatusBadRequest, "Failed fetching LobbyUsers")
+			return
+		}
+		pUserID, ok := users.GetUserId(r.Context())
+		if !ok {
+			h.RespondWithError(w, http.StatusUnauthorized, "Failed getting userid")
+			return
+		}
+
+		isHost := LobbyHost.UserID == pUserID
+		if !isHost {
+			h.RespondWithError(w, http.StatusUnauthorized, "User is not host")
+			return
+		}
+		if LobbyHost.UserID == TargetID {
+			h.RespondWithError(w, http.StatusUnauthorized, "Cannot kick self from lobby")
+			return
+		}
+
+		err = h.DB.RemoveLobbyUserFromLobby(r.Context(), database.RemoveLobbyUserFromLobbyParams{
+			LobbyID: LobbyID,
+			UserID:  TargetID,
+		})
+		if err != nil {
+			h.RespondWithError(w, http.StatusUnauthorized, "Error removing user from lobby")
+			return
+		}
+
+		h.RespondWithJSON(w, http.StatusOK, struct{}{})
+
+	}
+}
