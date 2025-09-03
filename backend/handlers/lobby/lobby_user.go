@@ -40,3 +40,14 @@ func CreateLobbyUser(h *handlers.Handlers) http.HandlerFunc {
 	}
 }
 
+func CreateLobbyHost(h *handlers.Handlers, r *http.Request, LobbyID uuid.UUID, UserID uuid.UUID) (database.LobbyUser, error) {
+	LobbyUser, err := h.DB.CreateLobbyUser(r.Context(), database.CreateLobbyUserParams{
+		LobbyID:  LobbyID,
+		UserID:   UserID,
+		JoinedAt: time.Now(),
+		Role:     "host",
+	})
+
+	return LobbyUser, err
+}
+
