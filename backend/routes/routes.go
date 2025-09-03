@@ -3,6 +3,7 @@ package routes
 import (
 	"github.com/LaurelEdison/clashcoder/backend/handlers"
 	"github.com/LaurelEdison/clashcoder/backend/handlers/auth"
+	"github.com/LaurelEdison/clashcoder/backend/handlers/lobby"
 	"github.com/LaurelEdison/clashcoder/backend/handlers/problem"
 	"github.com/LaurelEdison/clashcoder/backend/handlers/submission"
 	users "github.com/LaurelEdison/clashcoder/backend/handlers/user"
