@@ -88,3 +88,30 @@ func GetHostFromLobbyID(h *handlers.Handlers) http.HandlerFunc {
 	}
 }
 
+func RemoveSelfFromLobby(h *handlers.Handlers) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		LobbyIDstr := chi.URLParam(r, "lobby_id")
+		pLobbyID, err := uuid.Parse(LobbyIDstr)
+		if err != nil {
+			h.RespondWithError(w, http.StatusBadRequest, "Failed decoding lobby id")
+			return
+		}
+		pUserID, ok := users.GetUserId(r.Context())
+		if !ok {
+			h.RespondWithError(w, http.StatusUnauthorized, "Failed getting userid")
+			return
+		}
+
+		err = h.DB.RemoveLobbyUserFromLobby(r.Context(), database.RemoveLobbyUserFromLobbyParams{
+			LobbyID: pLobbyID,
+			UserID:  pUserID,
+		})
+		if err != nil {
+			h.RespondWithError(w, http.StatusInternalServerError, "Could not remove lobby user")
+			return
+		}
+
+		h.RespondWithJSON(w, http.StatusOK, struct{}{})
+	}
+}
+
