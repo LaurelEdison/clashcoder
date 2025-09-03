@@ -20,7 +20,9 @@ func SetupRoutes(router chi.Router, h *handlers.Handlers) {
 
 	router.Group(func(router chi.Router) {
 		router.Use(auth.JWTAuthMiddleWare)
+
 		router.Get("/me", users.FetchProfileSelf(h))
+
 		router.Post("/submissions", submission.CreateSubmission(h))
 		router.Get("/submissions/{problem_id}/latest", submission.GetSubmissionByUserID(h))
 		router.Get("/submissions/{problem_id}/all", submission.GetAllSubmissionsByUserID(h))
