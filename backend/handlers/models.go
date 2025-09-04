@@ -123,3 +123,47 @@ func DatabaseProblemTestsToProblemTests(dbProblemTests []database.ProblemTest) [
 	}
 	return problemtests
 }
+
+type Lobby struct {
+	ID         uuid.UUID `json:"id"`
+	CreatedAt  time.Time `json:"created_at"`
+	UpdatedAt  time.Time `json:"updated_at"`
+	InviteCode string    `json:"invite_code"`
+	MaxUsers   int32     `json:"max_users"`
+	Status     string    `json:"status"`
+	ReadyState bool      `json:"ready_state"`
+}
+
+func DatabaseLobbyToLobby(dbLobby database.Lobby) Lobby {
+	return Lobby{
+		ID:         dbLobby.ID,
+		InviteCode: dbLobby.InviteCode,
+		MaxUsers:   dbLobby.MaxUsers,
+		Status:     dbLobby.Status,
+		ReadyState: dbLobby.ReadyState,
+	}
+}
+
+type LobbyUser struct {
+	LobbyID  uuid.UUID `json:"lobby_id"`
+	UserID   uuid.UUID `json:"user_id"`
+	JoinedAt time.Time `json:"joined_at"`
+	Role     string    `json:"role"`
+}
+
+func DatabaseLobbyUserToLobbyUser(dbLobbyUser database.LobbyUser) LobbyUser {
+	return LobbyUser{
+		LobbyID:  dbLobbyUser.LobbyID,
+		UserID:   dbLobbyUser.UserID,
+		JoinedAt: dbLobbyUser.JoinedAt,
+		Role:     dbLobbyUser.Role,
+	}
+}
+
+func DatabaseLobbyUsersToLobbyUsers(dbLobbyUsers []database.LobbyUser) []LobbyUser {
+	LobbyUsers := []LobbyUser{}
+	for _, dbLobbyUser := range dbLobbyUsers {
+		LobbyUsers = append(LobbyUsers, DatabaseLobbyUserToLobbyUser(dbLobbyUser))
+	}
+	return LobbyUsers
+}

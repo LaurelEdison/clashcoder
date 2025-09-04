@@ -23,6 +23,7 @@ func CreateSubmission(h *handlers.Handlers) http.HandlerFunc {
 		UserID, ok := users.GetUserId(r.Context())
 		if !ok {
 			h.RespondWithError(w, http.StatusUnauthorized, "Failed getting userid")
+			return
 		}
 
 		decoder := json.NewDecoder(r.Body)
@@ -56,6 +57,7 @@ func GetSubmissionByID(h *handlers.Handlers) http.HandlerFunc {
 		submissionID, err := uuid.Parse(IDparam)
 		if err != nil {
 			h.RespondWithError(w, http.StatusBadRequest, "Failed parsing submission id")
+			return
 		}
 		submission, err := h.DB.GetSubmissionByID(r.Context(), submissionID)
 		if err != nil {
@@ -105,6 +107,7 @@ func GetAllSubmissionsByUserID(h *handlers.Handlers) http.HandlerFunc {
 		UserID, ok := users.GetUserId(r.Context())
 		if !ok {
 			h.RespondWithError(w, http.StatusUnauthorized, "Failed getting userid")
+			return
 		}
 
 		submissions, err := h.DB.GetAllSubmissionByUserID(r.Context(), database.GetAllSubmissionByUserIDParams{
