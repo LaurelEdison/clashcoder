@@ -15,7 +15,8 @@ CREATE TABLE lobbies(
 			'finished'
 		)
 	),
-	ready_state BOOLEAN NOT NULL DEFAULT false
+	ready_state BOOLEAN NOT NULL DEFAULT false,
+	problem_id UUID REFERENCES problems(id) ON DELETE CASCADE
 );
 
 CREATE UNIQUE INDEX unique_invite_code
