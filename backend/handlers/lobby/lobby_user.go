@@ -125,6 +125,10 @@ func RemoveUserFromLobby(h *handlers.Handlers) http.HandlerFunc {
 			return
 		}
 		LobbyHost, err := h.DB.GetHostFromLobbyID(r.Context(), LobbyID)
+		if err != nil {
+			h.RespondWithError(w, http.StatusInternalServerError, "Could not get lobby host")
+			return
+		}
 
 		TargetIDStr := chi.URLParam(r, "target_id")
 		TargetID, err := uuid.Parse(TargetIDStr)
