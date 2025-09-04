@@ -137,10 +137,6 @@ func RemoveUserFromLobby(h *handlers.Handlers) http.HandlerFunc {
 			return
 		}
 
-		if err != nil {
-			h.RespondWithError(w, http.StatusBadRequest, "Failed fetching LobbyUsers")
-			return
-		}
 		pUserID, ok := users.GetUserId(r.Context())
 		if !ok {
 			h.RespondWithError(w, http.StatusUnauthorized, "Failed getting userid")
