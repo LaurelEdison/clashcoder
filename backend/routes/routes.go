@@ -34,6 +34,7 @@ func SetupRoutes(router chi.Router, h *handlers.Handlers) {
 		router.Get("/lobbies/{lobby_id}/host", lobby.GetHostFromLobbyID(h))
 		router.Get("/lobbies/{lobby_id}/leave", lobby.RemoveSelfFromLobby(h))
 		router.Get("/lobbies/{lobby_id}/{target_id}/kick", lobby.RemoveUserFromLobby(h))
+		router.Post("/lobbies/{lobby_id}/start", lobby.StartMatch(h))
 
 		router.Group(func(router chi.Router) {
 			router.Use(auth.RequireAdmin)
