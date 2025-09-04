@@ -101,3 +101,90 @@ func GetLobbyById(h *handlers.Handlers) http.HandlerFunc {
 
 	}
 }
+
+func StartMatch(h *handlers.Handlers) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		type parameters struct {
+			ProblemIDstr string `json:"problem_id"`
+		}
+		decoder := json.NewDecoder(r.Body)
+		params := parameters{}
+		if err := decoder.Decode(&params); err != nil {
+			h.RespondWithError(w, http.StatusBadRequest, "Failed decoding json")
+			return
+		}
+
+		LobbyIDstr := chi.URLParam(r, "lobby_id")
+		LobbyID, err := uuid.Parse(LobbyIDstr)
+		if err != nil {
+			h.RespondWithError(w, http.StatusBadRequest, "Failed decoding lobby id")
+			return
+		}
+		LobbyHost, err := h.DB.GetHostFromLobbyID(r.Context(), LobbyID)
+		if err != nil {
+			h.RespondWithError(w, http.StatusInternalServerError, "Could not get lobby host")
+			return
+		}
+
+		pUserID, ok := users.GetUserId(r.Context())
+		if !ok {
+			h.RespondWithError(w, http.StatusUnauthorized, "Failed getting userid")
+			return
+		}
+
+		isHost := LobbyHost.UserID == pUserID
+		if !isHost {
+			h.RespondWithError(w, http.StatusUnauthorized, "User is not host")
+			return
+		}
+
+		var ProblemID uuid.UUID
+		if params.ProblemIDstr == "" {
+			Problem, err := h.DB.GetRandomProblem(r.Context())
+			if err != nil {
+				h.RespondWithError(w, http.StatusBadRequest, "Could not get problem")
+				return
+			}
+			ProblemID = Problem.ID
+		} else {
+			ProblemID, err = uuid.Parse(params.ProblemIDstr)
+			if err != nil {
+				h.RespondWithError(w, http.StatusBadRequest, "Could not parse problem id")
+				return
+			}
+			_, err = h.DB.GetProblemByID(r.Context(), ProblemID)
+			if err != nil {
+				h.RespondWithError(w, http.StatusBadRequest, "Could not get problem")
+				return
+			}
+		}
+		err = h.DB.SelectProblem(r.Context(), database.SelectProblemParams{
+			ID:        LobbyID,
+			ProblemID: uuid.NullUUID{UUID: ProblemID},
+		})
+		if err != nil {
+			h.RespondWithError(w, http.StatusBadRequest, "Could update with new problem")
+			return
+		}
+		err = h.DB.UpdateLobbyStartEnd(r.Context(), database.UpdateLobbyStartEndParams{
+			ID:        LobbyID,
+			StartedAt: sql.NullTime{Time: time.Now()},
+			EndedAt:   sql.NullTime{},
+		})
+		if err != nil {
+			h.RespondWithError(w, http.StatusBadRequest, "Could update start, end time")
+			return
+		}
+
+		err = h.DB.UpdateLobbyStatus(r.Context(), database.UpdateLobbyStatusParams{
+			ID:     LobbyID,
+			Status: "in_progress",
+		})
+		if err != nil {
+			h.RespondWithError(w, http.StatusInternalServerError, "Could not update lobby status")
+			return
+		}
+
+		h.RespondWithJSON(w, http.StatusOK, struct{}{})
+	}
+}
